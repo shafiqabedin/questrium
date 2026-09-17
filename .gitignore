@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+build/
+.vite/
+
+# Environment — never commit secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Supabase local
+.branches/
+.temp/
+supabase/.temp/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Avatar generation — raw output and model weights stay out of the repo.
+# Reviewed sprites are committed under public/avatars/ (see ADR 0003).
+tools/avatar-gen/out/
+tools/avatar-gen/models/
+tools/avatar-gen/.venv/
+*.safetensors
+*.ckpt
+*.pt
+
+# Python (avatar tooling)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
