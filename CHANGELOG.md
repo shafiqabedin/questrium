@@ -9,6 +9,18 @@ Versioning per [ADR 0004](docs/decisions/0004-versioning-and-release.md).
 ## [Unreleased]
 
 ### Added
+- Database schema: teachers, classes, students, teams, behaviours, and an
+  append-only point ledger (`supabase/migrations/0001`–`0006`)
+- Row Level Security policies with column-scoped views: `classmates_public`,
+  `teammates`, and a projector-safe `class_display` that contains no health data
+  by construction
+- `create_class`, `add_student`, `set_student_pin`; join-code generation that
+  avoids characters nine-year-olds misread off a projector
+- HP loss is a per-class config flag, so a purely positive economy needs no
+  migration
+- RLS test suite — 38 assertions covering teacher isolation, student read scope,
+  write denial, the PII cap, and append-only enforcement (`supabase/tests/`)
+- `docs/DEVELOPMENT.md` — conda Node env, since this machine has no system Node
 - Master blueprint (`docs/BLUEPRINT.md`) — mechanics, principles, architecture,
   privacy posture, roadmap
 - `CLAUDE.md` working agreement
