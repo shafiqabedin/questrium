@@ -88,3 +88,24 @@ The security is real — nothing is written, and the suite asserts the value is
 unchanged afterwards — but the denial is silent. So tests here assert on the
 *effect* (0 rows affected, value unchanged), not on an exception. If you write a
 new RLS test and expect an error that never comes, this is why.
+
+## This machine cannot reach Postgres directly
+
+Egress filtering here allows HTTPS (443) but blocks Postgres (5432/6543). The TCP
+connection opens and then the server never replies to the SSL request — it looks
+like a hang, not a refusal, which makes it easy to misdiagnose as a bad password.
+
+Consequences:
+
+- **The app is unaffected.** It talks to Supabase over HTTPS, so `npm run dev`,
+  auth, queries, and realtime all work normally.
+- **`psql` against Supabase, the Supabase CLI's `db push`, and anything else
+  needing a direct connection will not work from here.** Apply migrations through
+  the dashboard's SQL Editor instead, in filename order.
+- **Local schema testing is unaffected** — `./supabase/tests/run.sh` uses a
+  Postgres running on this machine.
+
+Never commit a connection string. They belong outside the repo entirely;
+`.gitignore` carries patterns for the obvious filenames as a backstop, but the
+string contains the database password and should not be in a file under the repo
+at all.

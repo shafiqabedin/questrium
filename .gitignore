@@ -55,3 +55,9 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# Credentials — never commit. Connection strings live outside the repo
+# (~/.questrium-db); these patterns catch a stray copy landing in here.
+pooler.txt
+*conn*.txt
+*.pgpass
