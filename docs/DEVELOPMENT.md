@@ -109,3 +109,41 @@ Never commit a connection string. They belong outside the repo entirely;
 `.gitignore` carries patterns for the obvious filenames as a backstop, but the
 string contains the database password and should not be in a file under the repo
 at all.
+
+## Verifying a migration run
+
+After applying `0001`–`0006` to a project, this should match:
+
+```sql
+select
+  (select count(*) from information_schema.tables
+     where table_schema='public' and table_type='BASE TABLE') as tables,      -- 7
+  (select count(*) from information_schema.views
+     where table_schema='public') as views,                                    -- 3
+  (select count(*) from pg_policies where schemaname='public') as policies,    -- 27
+  (select count(*) from information_schema.columns
+     where table_name='class_display'
+       and column_name in ('hp','hp_max','is_fallen')) as projector_hp_leak,   -- 0
+  (select count(*) from information_schema.columns
+     where table_name='classmates_public'
+       and column_name in ('hp','is_fallen','pin_hash','hp_loss_multiplier'))
+     as classmate_leak;                                                        -- 0
+```
+
+The two zeros are the ones that matter: they confirm the projector and
+class-wide views carry no health data, which is blueprint §4.2 enforced by the
+schema rather than by the UI remembering to leave it out. If either becomes
+non-zero, a view has been widened and that is a privacy regression, not a
+cosmetic one.
+
+Tables and views are stable numbers. Function counts vary by database — the test
+database also holds the suite's own assertion helpers — so count objects by name
+rather than trusting a total.
+
+## Re-running a migration
+
+The migrations are not idempotent: `create table` and `create type` both error if
+the object exists, which stops the script at that point. That makes an accidental
+re-run mostly harmless (it fails early and changes nothing) but it does mean you
+cannot use a re-run to "top up" a partial apply. If a migration half-applied,
+work out what landed before continuing.
